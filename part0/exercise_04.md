@@ -10,7 +10,7 @@ sequenceDiagram
     server-->>browser: HTTP status 302 
     deactivate server
 
-    Note right of browser: The server responds with a redirect to the notes page
+    Note left of server: The server responds with a redirect to the notes page
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/notes
     activate server
