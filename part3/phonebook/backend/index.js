@@ -1,6 +1,7 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
-
+const Person = require('./models/person')
 
 morgan.token('body', (req) => req.body ? JSON.stringify(req.body) : '')
 
@@ -10,58 +11,36 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 app.use(express.static('dist'))
 
 
-const generateId = () => {
-  const maxId = Math.floor(Math.random() * 1000);
-  return String(maxId)
-}
-
-
-let contacts = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/info', (request, response) => {
-  let numberOfContacts = contacts.length
-  const info = `<p>Phonebook has info for ${numberOfContacts} people</p><p>${new Date()}</p>`
-  response.send(info)
+  Person.countDocuments({}).then(numberOfContacts => {
+    const info = `<p>Phonebook has info for ${numberOfContacts} people</p><p>${new Date()}</p>`
+    response.send(info)
+  })
 })
 
 app.get('/api/persons', (request, response) => {
-  response.json(contacts)
+  Person.find({}).then(result => {
+    response.json(result)
+  })
 })
 app.get('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  const contact = contacts.find(contact => contact.id === id)
-   if (contact) {
-    response.json(contact)
-  } else {
-    response.status(404).end()
-  }
+  Person.findById(id).then(result => {
+    if (result) {
+      response.json(result)
+    } else {
+      response.status(404).end()
+    }
+  }).catch(error => {
+    response.status(400).send({ error: 'malformatted id' })
+  })
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', async (request, response) => {
   const body = request.body
 
   if (!body.name || !body.number) {
@@ -69,31 +48,35 @@ app.post('/api/persons', (request, response) => {
       error: 'name or number missing' 
     })
   }
-    if (contacts.find(contact => contact.name.toLowerCase() === body.name.toLowerCase())) {
-    return response.status(400).json({ 
-      error: 'name must be unique' 
-    })
-  }
-
-  const contact = {
+  const existingPerson = await Person.findOne({ name: body.name.toLowerCase() }).exec();
+  console.log('existingPerson', existingPerson);
+    if (existingPerson) {
+      return response.status(400).json({ 
+        error: 'name must be unique' 
+      })
+    } 
+  const contact = new Person({
     name: body.name,
-    number: body.number,
-    id: generateId(),
-  }
+    number: body.number
+  })
 
-  contacts = contacts.concat(contact)
-
-  response.json(contact)
+  contact.save().then(savedContact => {
+    response.json(savedContact)
+  })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
   const id = request.params.id
-  contacts = contacts.filter(contact => contact.id !== id)
-
-  response.status(204).end()
+  Person.findByIdAndRemove(id)
+    .then(() => {
+      response.status(204).end()
+    })
+    .catch(error => {
+      response.status(400).send({ error: 'malformatted id' })
+    })
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
