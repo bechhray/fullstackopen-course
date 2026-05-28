@@ -49,12 +49,10 @@ const App = () => {
           notifyWith(`Phonenumber of ${updatedPerson.name} updated!`)
           clearForm()
         })
-        .catch(() => {
-          notifyWith(
-            `Information of ${person.name} has already been removed from server`,
+        .catch((error) => {
+          notifyWith(error.response.data.error,
             true
           )
-          setPersons(persons.filter((p) => p.name !== person.name))
         })
     }
   }
@@ -74,6 +72,9 @@ const App = () => {
         setPersons(persons.concat(createdPerson))
         notifyWith(`Added ${createdPerson.name}`)
         clearForm()
+      })
+      .catch((error) => {
+        notifyWith(error.response.data.error, true)
       })
   }
 
