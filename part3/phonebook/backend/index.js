@@ -50,24 +50,24 @@ app.get('/api/persons/:id', (request, response, next) => {
       response.status(404).end()
     }
   }).catch(error => next(error))
-  })
+})
 
 
 app.post('/api/persons', async (request, response, next) => {
   const body = request.body
 
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'name or number missing' 
+    return response.status(400).json({
+      error: 'name or number missing'
     })
   }
-  const existingPerson = await Person.findOne({ name: body.name.toLowerCase() }).exec();
-  console.log('existingPerson', existingPerson);
-    if (existingPerson) {
-      return response.status(400).json({ 
-        error: 'name must be unique' 
-      })
-    } 
+  const existingPerson = await Person.findOne({ name: body.name.toLowerCase() }).exec()
+  console.log('existingPerson', existingPerson)
+  if (existingPerson) {
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
   const contact = new Person({
     name: body.name,
     number: body.number
@@ -113,7 +113,7 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 app.use(errorHandler)
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

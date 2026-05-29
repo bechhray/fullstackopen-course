@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
 mongoose.set('strictQuery', false)
-mongoose.set('runValidators', true) // Even though I am not using findOneAndUpdate, I want to make sure that the validators are run when updating a person. 
+mongoose.set('runValidators', true) // Even though I am not using findOneAndUpdate, I want to make sure that the validators are run when updating a person.
 
 const url = process.env.MONGODB_URI
 
 mongoose.connect(url, { family: 4 })
 
-  .then(result => {
+  .then(() => {
     console.log('connected to MongoDB')
   })
   .catch(error => {
@@ -26,7 +26,7 @@ const personSchema = new mongoose.Schema({
     minlength: 8,
     validate: {
       validator: function(v) {
-        return /\d{2,3}-\d{5,}/.test(v);
+        return /\d{2,3}-\d{5,}/.test(v)
       },
       message: props => `${props.value} is not a valid phone number!`
     },
