@@ -14,12 +14,12 @@ const App = () => {
   const [notification, setNotification] = useState({ message: null })
 
   useEffect(() => {
-    personService.getAll().then((initialPersons) => {
+    personService.getAll().then(initialPersons => {
       setPersons(initialPersons)
     })
   }, [])
 
-  const personsToShow = persons.filter((person) =>
+  const personsToShow = persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   )
 
@@ -35,31 +35,35 @@ const App = () => {
     }, 5000)
   }
 
-  const updatePerson = (person) => {
+  const updatePerson = person => {
     const ok = window.confirm(
       `${newName} is already added to phonebook, replace the old number with a new one?`
     )
     if (ok) {
       personService
         .update({ ...person, number: newNumber })
-        .then((updatedPerson) => {
-          setPersons(
-            persons.map((p) => (p.id !== person.id ? p : updatedPerson))
-          )
+        .then(updatedPerson => {
+          setPersons(persons.map(p => (p.id !== person.id ? p : updatedPerson)))
           notifyWith(`Phonenumber of ${updatedPerson.name} updated!`)
           clearForm()
         })
-        .catch((error) => {
-          notifyWith(error.response.data.error,
-            true
-          )
+        .catch(error => {
+          if (error.status === 400) {
+            notifyWith(error.response.data.error, true)
+          } else if (error.status === 404) {
+            notifyWith(
+              `Information of ${person.name} has already been removed from server`,
+              true
+            )
+            setPersons(persons.filter(p => p.name !== person.name))
+          }
         })
     }
   }
 
-  const onAddNew = (event) => {
+  const onAddNew = event => {
     event.preventDefault()
-    const existingPerson = persons.find((p) => p.name === newName)
+    const existingPerson = persons.find(p => p.name === newName)
 
     if (existingPerson) {
       updatePerson(existingPerson)
@@ -68,22 +72,22 @@ const App = () => {
 
     personService
       .create({ name: newName, number: newNumber })
-      .then((createdPerson) => {
+      .then(createdPerson => {
         setPersons(persons.concat(createdPerson))
         notifyWith(`Added ${createdPerson.name}`)
         clearForm()
       })
-      .catch((error) => {
+      .catch(error => {
         notifyWith(error.response.data.error, true)
       })
   }
 
-  const onRemove = (person) => {
+  const onRemove = person => {
     const ok = window.confirm(`Delete ${person.name} ?`)
     if (ok) {
       personService
         .remove(person.id)
-        .then(() => setPersons(persons.filter((p) => p.id !== person.id)))
+        .then(() => setPersons(persons.filter(p => p.id !== person.id)))
 
       notifyWith(`Deleted ${person.name}`)
     }

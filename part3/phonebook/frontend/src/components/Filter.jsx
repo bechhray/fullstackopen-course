@@ -1,7 +1,7 @@
 const Filter = ({ filter, setFilter }) => (
   <div>
     filter shown with{' '}
-    <input value={filter} onChange={(event) => setFilter(event.target.value)} />
+    <input value={filter} onChange={event => setFilter(event.target.value)} />
   </div>
 )
 
