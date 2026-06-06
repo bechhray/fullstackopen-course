@@ -2,8 +2,7 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "title": "Ella Elmunen",
-  "author": "050-4400540",
-  "url": "http://example.com",
-  "likes": 0
+  "title": "Test blog without likes",
+  "author": "Kerrie Ray",
+  "url": "https://www.healthyfood.com/healthy-recipes/coconut-chicken-tenders-with-spinach-and-rice/"
 }
