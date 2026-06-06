@@ -20,6 +20,9 @@ blogsRouter.post('/', async (request, response) => {
 blogsRouter.put('/:id', async (request, response) => {
   const { title, author, url, likes } = request.body
   const blogToUpdate = await Blog.findById(request.params.id)
+  if (!blogToUpdate) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
   blogToUpdate.title = title
   blogToUpdate.author = author
   blogToUpdate.url = url
@@ -30,6 +33,9 @@ blogsRouter.put('/:id', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
   const blogToDelete = await Blog.findById(request.params.id)
+  if (!blogToDelete) {
+    return response.status(404).json({ error: 'blog not found' })
+  }
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
