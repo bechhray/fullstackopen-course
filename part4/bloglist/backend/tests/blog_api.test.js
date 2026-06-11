@@ -5,6 +5,7 @@ const supertest = require('supertest')
 const app = require('../app')
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
@@ -48,7 +49,19 @@ describe('when there are initially some blogs saved', () => {
 })
 
 describe('addition of a new blog', () => {
-  const validToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA5NDc4MDAsImV4cCI6MTc4MDk1MTQwMH0.XQIUJuMa5CdGmVfCHzlkkWSYE-dgqYP-n4nHD-43KQA'
+  let token
+
+  beforeEach(async () => {
+    await User.deleteMany({})
+    await api
+      .post('/api/users')
+      .send({ username: 'rbech', name: 'Rayene Bech', password: 'salainen' })
+    const loginResponse = await api
+      .post('/api/login')
+      .send({ username: 'rbech', password: 'salainen' })
+    token = loginResponse.body.token
+  })
+
   test('a valid blog can be added ', async () => {
     const newBlog = {
       title: 'New Blog Title',
@@ -56,8 +69,6 @@ describe('addition of a new blog', () => {
       url: 'https://www.example.com/new-blog',
       likes: 0
     }
-    const loginResponse = await api.post('/api/login').send({ username: 'rbech', password: 'salainen' })
-    const token = loginResponse.body.token
     await api
       .post('/api/blogs')
       .set('Authorization', `Bearer ${token}`)
@@ -73,6 +84,27 @@ describe('addition of a new blog', () => {
 
     assert(titles.includes('New Blog Title'))
   })
+  test('a request without a token fails with status code 401', async () => {
+    const blogsAtStart = await helper.blogsInDb()
+    const newBlog = {
+      title: 'Another Blog Title',
+      author: 'Author Name',
+      url: 'https://www.example.com/new-blog',
+      likes: 0
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    const blogsAtEnd = await helper.blogsInDb()
+
+    const titles = blogsAtEnd.map(r => r.title)
+
+    assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+
+    assert(!titles.includes('AnotheR Blog Title'))
+  })
 
   test('blog without title is not added', async () => {
     const blogsAtStart = await helper.blogsInDb()
@@ -84,7 +116,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
-      .set('Authorization', validToken)
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
@@ -103,7 +135,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
-      .set('Authorization', validToken)
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(400)
 
@@ -121,7 +153,7 @@ describe('addition of a new blog', () => {
 
     const response = await api
       .post('/api/blogs')
-      .set('Authorization', validToken)
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -131,8 +163,6 @@ describe('addition of a new blog', () => {
 })
 
 describe('deletion of a blog', () => {
-  const nonValidToken = 'Bearer nonvalidtoken'
-  const validToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA5NDc4MDAsImV4cCI6MTc4MDk1MTQwMH0.XQIUJuMa5CdGmVfCHzlkkWSYE-dgqYP-n4nHD-43KQA'
 
   test('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
@@ -140,7 +170,6 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
-      .set('Authorization', validToken)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
