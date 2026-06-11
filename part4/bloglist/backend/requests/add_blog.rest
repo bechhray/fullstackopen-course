@@ -1,9 +1,9 @@
 POST http://localhost:3001/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NisInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA4MTUyMjd9.KG7s7q5dNESkEPLsB94DtXded1gDFZRWESezaIe6Ei8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA5NDc4MDAsImV4cCI6MTc4MDk1MTQwMH0.XQIUJuMa5CdGmVfCHzlkkWSYE-dgqYP-n4nHD-43KQA
 
 {
-  "title": "Another Test blog",
+  "title": "bimbim Test blog",
   "author": "Rayene Blogs",
   "url": "https://www.healthyfood.com/healthy-recipes/coconut-chicken-tenders-with-spinach-and-rice/",
   "likes": 4

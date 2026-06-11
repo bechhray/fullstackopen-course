@@ -48,6 +48,7 @@ describe('when there are initially some blogs saved', () => {
 })
 
 describe('addition of a new blog', () => {
+  const validToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA5NDc4MDAsImV4cCI6MTc4MDk1MTQwMH0.XQIUJuMa5CdGmVfCHzlkkWSYE-dgqYP-n4nHD-43KQA'
   test('a valid blog can be added ', async () => {
     const newBlog = {
       title: 'New Blog Title',
@@ -55,9 +56,11 @@ describe('addition of a new blog', () => {
       url: 'https://www.example.com/new-blog',
       likes: 0
     }
-
+    const loginResponse = await api.post('/api/login').send({ username: 'rbech', password: 'salainen' })
+    const token = loginResponse.body.token
     await api
       .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -81,6 +84,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', validToken)
       .send(newBlog)
       .expect(400)
 
@@ -99,6 +103,7 @@ describe('addition of a new blog', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', validToken)
       .send(newBlog)
       .expect(400)
 
@@ -116,6 +121,7 @@ describe('addition of a new blog', () => {
 
     const response = await api
       .post('/api/blogs')
+      .set('Authorization', validToken)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -125,12 +131,16 @@ describe('addition of a new blog', () => {
 })
 
 describe('deletion of a blog', () => {
+  const nonValidToken = 'Bearer nonvalidtoken'
+  const validToken = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODA5NDc4MDAsImV4cCI6MTc4MDk1MTQwMH0.XQIUJuMa5CdGmVfCHzlkkWSYE-dgqYP-n4nHD-43KQA'
+
   test('succeeds with status code 204 if id is valid', async () => {
     const blogsAtStart = await helper.blogsInDb()
     const blogToDelete = blogsAtStart[0]
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', validToken)
       .expect(204)
 
     const blogsAtEnd = await helper.blogsInDb()
