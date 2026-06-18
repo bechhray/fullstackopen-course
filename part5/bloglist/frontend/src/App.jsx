@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -105,7 +106,19 @@ const App = () => {
     }
   }
 
-  
+  const blogForm = () => (
+    <Togglable buttonLabel="create new blog">
+      <BlogForm
+        newTitle={newTitle}
+        setNewTitle={setNewTitle}
+        newAuthor={newAuthor}
+        setNewAuthor={setNewAuthor}
+        newUrl={newUrl}
+        setNewUrl={setNewUrl}
+        addBlog={addBlog}
+      />
+    </Togglable>
+  )
   
   return (
     <div>
@@ -127,15 +140,7 @@ const App = () => {
         <h2>blogs</h2>
         <Notification message={notification} type={notificationType} />
         <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
-        <BlogForm
-          newTitle={newTitle}
-          setNewTitle={setNewTitle}
-          newAuthor={newAuthor}
-          setNewAuthor={setNewAuthor}
-          newUrl={newUrl}
-          setNewUrl={setNewUrl}
-          addBlog={addBlog}
-        />
+        {blogForm()}
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}

@@ -1,4 +1,6 @@
-const BlogForm = ({ newTitle, setNewTitle, newAuthor, setNewAuthor, newUrl, setNewUrl, addBlog }) => (
+const BlogForm = ({ newTitle, setNewTitle, newAuthor, setNewAuthor, newUrl, setNewUrl, addBlog }) => {
+    return (
+    <div>
     <form onSubmit={addBlog}>
       <div>
         <label>
@@ -32,6 +34,8 @@ const BlogForm = ({ newTitle, setNewTitle, newAuthor, setNewAuthor, newUrl, setN
       </div>
       <button type="submit">create</button>
     </form>
-  )
+    </div>
+    
+  )}
 
 export default BlogForm
