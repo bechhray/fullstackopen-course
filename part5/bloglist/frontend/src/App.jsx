@@ -90,6 +90,20 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (id, updatedBlog) => {
+    try {
+      const returnedBlog = await blogService.update(id, updatedBlog)
+      returnedBlog.user = updatedBlog.user
+      setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
+    } catch (exception) {
+      setNotification('Failed to update blog: ' + (exception.response?.data?.error || exception.message))
+      setNotificationType('error')
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    }
+  }
+
   const blogForm = () => (
     <Togglable buttonLabel="create new blog" ref={blogFormRef}>
       <BlogForm createBlog={createBlog}/>
@@ -112,7 +126,7 @@ const App = () => {
         <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
         {blogForm()}
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         )}
       </div>
     )}

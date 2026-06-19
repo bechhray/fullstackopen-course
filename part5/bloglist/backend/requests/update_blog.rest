@@ -1,5 +1,6 @@
-PUT http://localhost:3001/api/blogs/1
+PUT http://localhost:3001/api/blogs/6a2be533b3c2da5b0b5e435d
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InJiZWNoIiwiaWQiOiI2YTI1MGZiNWFkNDBlYzAwMjVlNDNmMzgiLCJpYXQiOjE3ODE4Nzk1OTZ9.lJxUVeTd88dYzM43WpZ1rPuyG5qtsZeNwoYiUJjM0lo
 
 {
   "title": "Updated Blog Title",
