@@ -105,6 +105,27 @@ const App = () => {
     }
   }
 
+  const deleteBlog = async (id, title) => {
+    try {
+      if (!window.confirm(`Are you sure you want to delete the blog "${title}"?`)) {
+        return
+      }
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      setNotification('Blog removed successfully!')
+      setNotificationType('success')
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    } catch (exception) {
+      setNotification('Failed to remove blog: ' + (exception.response?.data?.error || exception.message))
+      setNotificationType('error')
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    }
+  }
+
   const blogForm = () => (
     <Togglable buttonLabel="create new blog" ref={blogFormRef}>
       <BlogForm createBlog={createBlog}/>
@@ -127,7 +148,7 @@ const App = () => {
         <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
         {blogForm()}
         {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={user.username} />
         )}
       </div>
     )}
