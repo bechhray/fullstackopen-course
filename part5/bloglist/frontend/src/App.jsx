@@ -18,6 +18,7 @@ const App = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       const blogs = await blogService.getAll()
+      blogs.sort((a, b) => b.likes - a.likes)
       setBlogs(blogs)
     }
     fetchBlogs()
@@ -94,7 +95,7 @@ const App = () => {
     try {
       const returnedBlog = await blogService.update(id, updatedBlog)
       returnedBlog.user = updatedBlog.user
-      setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog))
+      setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog).sort((a, b) => b.likes - a.likes))
     } catch (exception) {
       setNotification('Failed to update blog: ' + (exception.response?.data?.error || exception.message))
       setNotificationType('error')
