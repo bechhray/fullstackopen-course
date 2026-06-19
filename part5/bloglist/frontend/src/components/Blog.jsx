@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import { useState  } from 'react'
 
 const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
   const blogStyle = {
@@ -13,7 +13,6 @@ const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
   const toggleDetails = () => {
     setShowDetails(!showDetails)
   }
-  
   const handleLike = () => {
     const updatedBlog = {
       ...blog,
@@ -24,23 +23,22 @@ const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
 
   return (
     <div style={blogStyle}>
-    {blog.title} {blog.author} <button onClick={toggleDetails}>{showDetails ? 'hide' : 'view'}</button>
-    {showDetails && (
-      <div>
-        {blog.url}
-        <br />
-        {blog.likes} likes <button onClick={handleLike}>like</button>
-        <br />
-        {blog.user.name}
-        <br />
-        {blog.user && blog.user.username === username && (
-          <button onClick={() => deleteBlog(blog.id, blog.title)}>remove</button>
-        )}
-      </div>
-    )}
-  </div>  
+      {blog.title} {blog.author} <button onClick={toggleDetails}>{showDetails ? 'hide' : 'view'}</button>
+      {showDetails && (
+        <div>
+          {blog.url}
+          <br />
+          {blog.likes} likes <button onClick={handleLike}>like</button>
+          <br />
+          {blog.user.name}
+          <br />
+          {blog.user && blog.user.username === username && (
+            <button onClick={() => deleteBlog(blog.id, blog.title)}>remove</button>
+          )}
+        </div>
+      )}
+    </div>
   )
 
 }
-  
 export default Blog

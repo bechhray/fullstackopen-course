@@ -7,7 +7,6 @@ import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
-
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [notification, setNotification] = useState(null)
@@ -34,14 +33,14 @@ const App = () => {
   }, [])
 
 
-  const DoLogin = async (username, password) => {
+  const doLogin = async (username, password) => {
     try {
       const user = await loginService.login({
         username, password,
       })
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
-      ) 
+      )
       setNotification(`Logged in successfully! Welcome ${user.name}!`)
       setNotificationType('success')
       setTimeout(() => {
@@ -131,27 +130,26 @@ const App = () => {
       <BlogForm createBlog={createBlog}/>
     </Togglable>
   )
-  
   return (
     <div>
       {!user && (
         <div>
-        <h2>log in to application</h2>
-        <Notification message={notification} type={notificationType} />
-        <LoginForm DoLogin={DoLogin}/>
+          <h2>log in to application</h2>
+          <Notification message={notification} type={notificationType} />
+          <LoginForm doLogin={doLogin}/>
         </div>
       )}
       {user && (
         <div>
-        <h2>blogs</h2>
-        <Notification message={notification} type={notificationType} />
-        <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
-        {blogForm()}
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={user.username} />
-        )}
-      </div>
-    )}
+          <h2>blogs</h2>
+          <Notification message={notification} type={notificationType} />
+          <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
+          {blogForm()}
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={user.username} />
+          )}
+        </div>
+      )}
     </div>
   )
 }

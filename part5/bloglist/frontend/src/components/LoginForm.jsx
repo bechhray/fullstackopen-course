@@ -1,17 +1,16 @@
 import { useState } from 'react'
 
-const LoginForm = ({DoLogin}) => {
-    const [username, setUsername] = useState('') 
-    const [password, setPassword] = useState('') 
+const LoginForm = ({ doLogin }) => {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-    const handleLogin = async event => {
-      event.preventDefault()
-      console.log('logging in with', username, password)
-      await DoLogin(username, password)
-      setUsername('')
-      setPassword('')
-    }
-  
+  const handleLogin = async event => {
+    event.preventDefault()
+    console.log('logging in with', username, password)
+    await doLogin(username, password)
+    setUsername('')
+    setPassword('')
+  }
   return (
     <form onSubmit={handleLogin}>
       <div>
