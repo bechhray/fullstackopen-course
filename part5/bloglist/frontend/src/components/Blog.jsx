@@ -23,8 +23,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
 
   return (
     <div style={blogStyle} className='blog'>
-      <span className='title'>{blog.title}</span>
-      <span className='author'>{blog.author}</span> 
+      <span className='title'>{blog.title}</span> By <span className='author'>{blog.author}</span>
       <button className='view-button' onClick={toggleDetails}>{showDetails ? 'hide' : 'view'}</button>
       {showDetails && (
         <div>

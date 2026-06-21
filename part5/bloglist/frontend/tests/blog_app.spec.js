@@ -45,6 +45,15 @@ test.describe('Blog app', () => {
       await page.getByRole('button', { name: 'login' }).click()
     })
 
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'new blog' }).click()
+      await page.getByLabel('title').fill('Testing with Playwright')
+      await page.getByLabel('author').fill('Rayene Bech')
+      await page.getByLabel('url').fill('http://example.com')
+      await page.getByRole('button', { name: 'create' }).click()
+      const newBlog = page.getByText('Testing with Playwright By Rayene Bech')
+      await expect(newBlog).toBeVisible()
+    })
+
   })
 })
-
