@@ -43,6 +43,7 @@ test.describe('Blog app', () => {
       await page.getByLabel('username').fill('rbech')
       await page.getByLabel('password').fill('salainen')
       await page.getByRole('button', { name: 'login' }).click()
+      await page.getByRole('button', { name: 'new blog' }).waitFor()
     })
 
     test('a new blog can be created', async ({ page }) => {
@@ -53,6 +54,23 @@ test.describe('Blog app', () => {
       await page.getByRole('button', { name: 'create' }).click()
       const newBlog = page.getByText('Testing with Playwright By Rayene Bech')
       await expect(newBlog).toBeVisible()
+    })
+
+    test.describe('and a blog exists', () => {
+      test.beforeEach(async ({ page }) => {
+        await page.getByRole('button', { name: 'new blog' }).click()
+        await page.getByLabel('title').fill('Existing Blog')
+        await page.getByLabel('author').fill('Rayene Bech')
+        await page.getByLabel('url').fill('http://example.com')
+        await page.getByRole('button', { name: 'create' }).click()
+      })
+
+      test('A blog can be liked', async ({ page }) => {
+        await page.getByText('Existing Blog By Rayene Bech').getByRole('button', { name: 'view' }).click()
+        await page.getByRole('button', { name: 'like' }).click()
+        const likes = page.getByText('1 likes')
+        await expect(likes).toBeVisible()
+      })
     })
 
   })
