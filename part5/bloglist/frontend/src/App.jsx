@@ -1,27 +1,16 @@
-import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import LoginForm from './components/LoginForm'
-import BlogForm from './components/BlogForm'
-import Notification from './components/Notification'
-import Togglable from './components/Togglable'
+import { useState, useEffect } from 'react'
 import blogService from './services/blogs'
-import loginService from './services/login'
+import BlogList from './components/BlogList'
+import Login from './components/Login'
+
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link
+} from 'react-router-dom'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [notification, setNotification] = useState(null)
-  const [notificationType, setNotificationType] = useState('success')
   const [user, setUser] = useState(null)
-  const blogFormRef = useRef()
-
-  useEffect(() => {
-    const fetchBlogs = async () => {
-      const blogs = await blogService.getAll()
-      blogs.sort((a, b) => b.likes - a.likes)
-      setBlogs(blogs)
-    }
-    fetchBlogs()
-  }, [])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -32,125 +21,43 @@ const App = () => {
     }
   }, [])
 
-
-  const doLogin = async (username, password) => {
-    try {
-      const user = await loginService.login({
-        username, password,
-      })
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
-      setNotification(`Logged in successfully! Welcome ${user.name}!`)
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-      console.log('logged in user:', user)
-      blogService.setToken(user.token)
-      setUser(user)
-    } catch (exception) {
-      console.log('wrong credentials')
-      setNotification('Wrong username or password')
-      setNotificationType('error')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-      console.error(exception)
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      const blogs = await blogService.getAll()
+      blogs.sort((a, b) => b.likes - a.likes)
+      setBlogs(blogs)
     }
-  }
+    fetchBlogs()
+  }, [])
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
+    blogService.setToken(null)
     setUser(null)
-    setNotification('Logged out successfully!')
-    setNotificationType('success')
-    setTimeout(() => {
-      setNotification(null)
-    }, 3000)
   }
 
-  const createBlog = async (blogObject) => {
-    try {
-      blogFormRef.current.toggleVisibility()
-      const returnedBlog = await blogService.create(blogObject)
-      returnedBlog.user = user
-      setBlogs(blogs.concat(returnedBlog))
-      setNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`)
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    } catch (exception) {
-      setNotification('Failed to create blog: ' + (exception.response?.data?.error || exception.message))
-      setNotificationType('error')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
+  const padding = {
+    padding: 5
   }
 
-  const updateBlog = async (id, updatedBlog) => {
-    try {
-      const returnedBlog = await blogService.update(id, updatedBlog)
-      returnedBlog.user = updatedBlog.user
-      setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog).sort((a, b) => b.likes - a.likes))
-    } catch (exception) {
-      setNotification('Failed to update blog: ' + (exception.response?.data?.error || exception.message))
-      setNotificationType('error')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
-
-  const deleteBlog = async (id, title) => {
-    try {
-      if (!window.confirm(`Are you sure you want to delete the blog "${title}"?`)) {
-        return
-      }
-      await blogService.remove(id)
-      setBlogs(blogs.filter(blog => blog.id !== id))
-      setNotification('Blog removed successfully!')
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    } catch (exception) {
-      setNotification('Failed to remove blog: ' + (exception.response?.data?.error || exception.message))
-      setNotificationType('error')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
-
-  const blogForm = () => (
-    <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-      <BlogForm createBlog={createBlog}/>
-    </Togglable>
-  )
   return (
-    <div>
-      {!user && (
-        <div>
-          <h2>log in to application</h2>
-          <Notification message={notification} type={notificationType} />
-          <LoginForm doLogin={doLogin}/>
-        </div>
-      )}
-      {user && (
-        <div>
-          <h2>blogs</h2>
-          <Notification message={notification} type={notificationType} />
-          <span>{user.name} logged in</span> <button onClick={handleLogout}>logout</button>
-          {blogForm()}
-          {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={user.username} />
-          )}
-        </div>
-      )}
-    </div>
+    <Router>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        {user
+          ? <button onClick={handleLogout}>logout</button>
+          : <Link style={padding} to="/login">login</Link>
+        }
+      </div>
+      <Routes>
+        <Route path="/" element={
+          <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
+        } />
+        <Route path="/login" element={
+          <Login user={user} setUser={setUser} />
+        } />
+      </Routes>
+    </Router>
   )
 }
 
