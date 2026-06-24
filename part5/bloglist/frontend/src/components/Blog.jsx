@@ -20,7 +20,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
 
   return (
     <div className='blog'>
-      <h3>{blog.author}: {blog.title}</h3>
+      <h3 className='title author'>{blog.author}: {blog.title}</h3>
       <div>
         <a className='url' href={blog.url} target='_blank'>{blog.url}</a>
         <br />
