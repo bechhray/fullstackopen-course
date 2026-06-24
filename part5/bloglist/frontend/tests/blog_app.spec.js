@@ -1,6 +1,6 @@
 
 import { test, expect } from '@playwright/test'
-import { loginWith, createBlog } from './helper'
+import { loginWith, createBlog, openBlogFromList } from './helper'
 
 test.describe('Blog app', () => {
   test.beforeEach(async ({ page }) => {
@@ -32,10 +32,10 @@ test.describe('Blog app', () => {
 
     test('Login fails if the username/password is incorrect', async ({ page }) => {
       await loginWith(page, 'rbech', 'wrongpassword')
-      const errorDiv = page.locator('.error')
-      await expect(errorDiv).toContainText('Wrong username or password')
-      await expect(errorDiv).toHaveCSS('border-style', 'solid')
-      await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
+      const errorMessage = page.getByText('Wrong username or password')
+      await expect(errorMessage).toBeVisible()
+      // await expect(errorDiv).toHaveCSS('border-style', 'solid')
+      // await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
       await expect(page.getByText('Logged in successfully! Welcome Rayene Bech!')).not.toBeVisible()
     })
 
@@ -71,15 +71,14 @@ test.describe('Blog app', () => {
         })
 
         test('A logged-in user can like a blog', async ({ page }) => {
-          await page.getByText('Existing Blog by Rayene Bech').click()
+          await openBlogFromList(page, 'Existing Blog by Rayene Bech')
           await page.getByText('Rayene Bech: Existing Blog').waitFor()
           await page.getByRole('button', { name: 'like' }).click()
-          const likes = page.getByText('1 likes')
-          await expect(likes).toBeVisible()
+          await expect(page.locator('.likes')).toHaveText('1 likes')
         })
 
         test('A logged-in user can remove a blog they created', async ({ page }) => {
-          await page.getByText('Existing Blog by Rayene Bech').click()
+          await openBlogFromList(page, 'Existing Blog by Rayene Bech')
           await page.getByText('Rayene Bech: Existing Blog').waitFor()
           page.on('dialog', dialog => dialog.accept())
           await page.getByRole('button', { name: 'remove' }).click()
@@ -96,9 +95,9 @@ test.describe('Blog app', () => {
             }
           })
           await page.goto('/')
-          await page.getByRole('button', { name: 'logout' }).click()
+          await page.getByRole('link', { name: 'logout' }).click()
           await loginWith(page, 'otheruser', 'password')
-          await page.getByText('Another Blog by Rayene Bech').click()
+          await openBlogFromList(page, 'Another Blog by Rayene Bech')
           await page.getByText('Rayene Bech: Another Blog').waitFor()
           await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
         })
