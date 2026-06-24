@@ -21,7 +21,8 @@ const Login = ({ user, setUser }) => {
       setNotificationType('success')
       setTimeout(() => {
         setNotification(null)
-      }, 5000)
+        window.location.href = '/'
+      }, 3000)
       blogService.setToken(user.token)
       setUser(user)
     } catch {
@@ -29,7 +30,7 @@ const Login = ({ user, setUser }) => {
       setNotificationType('error')
       setTimeout(() => {
         setNotification(null)
-      }, 5000)
+      }, 3000)
     }
   }
 

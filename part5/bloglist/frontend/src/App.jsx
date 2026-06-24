@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import blogService from './services/blogs'
 import BlogList from './components/BlogList'
+import CreateBlog from './components/CreateBlog'
 import Login from './components/Login'
 import Blog from './components/Blog'
 
 import {
-  BrowserRouter as Router,
   Routes, Route, Link, useMatch
 } from 'react-router-dom'
 
@@ -64,7 +64,8 @@ const App = () => {
       setNotificationType('success')
       setTimeout(() => {
         setNotification(null)
-      }, 5000)
+      }, 3000)
+      window.location.href = '/'
     } catch (exception) {
       setNotification('Failed to remove blog: ' + (exception.response?.data?.error || exception.message))
       setNotificationType('error')
@@ -79,40 +80,38 @@ const App = () => {
   }
   const username = user ? user.username : null
 
-  const AppContent = () => {
-    const match = useMatch('/blogs/:id')
-    const blog = match
-      ? blogs.find(b => b.id === match.params.id)
-      : null
-
-    return (
-      <div>
-        <div>
-          <Link style={padding} to="/">blogs</Link>
-          {user
-            ? <button onClick={handleLogout}>logout</button>
-            : <Link style={padding} to="/login">login</Link>
-          }
-        </div>
-        <Routes>
-          <Route path="/blogs/:id" element={
-            <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={username} />
-          } />
-          <Route path="/" element={
-            <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
-          } />
-          <Route path="/login" element={
-            <Login user={user} setUser={setUser} />
-          } />
-        </Routes>
-      </div>
-    )
-  }
+  const match = useMatch('/blogs/:id')
+  const blog = match
+    ? blogs.find(b => b.id === match.params.id)
+    : null
 
   return (
-    <Router>
-      <AppContent />
-    </Router>
+    <div>
+      <div>
+        <Link style={padding} to="/">blogs</Link>
+        { user && <Link style={padding} to="/create">new blog</Link> }
+        {user
+          ? <button onClick={handleLogout}>logout</button>
+          : <Link style={padding} to="/login">login</Link>
+        }
+      </div>
+      <Routes>
+        <Route path="/blogs/:id" element={
+          <>
+            <Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} username={username}/>
+          </>
+        } />
+        <Route path="/" element={
+          <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
+        } />
+        <Route path="/create" element={
+          <CreateBlog setNotification={setNotification} setNotificationType={setNotificationType} setBlogs={setBlogs} blogs={blogs} user={user} />
+        } />
+        <Route path="/login" element={
+          <Login user={user} setUser={setUser} />
+        } />
+      </Routes>
+    </div>
   )
 }
 

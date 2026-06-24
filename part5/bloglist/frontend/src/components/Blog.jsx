@@ -1,3 +1,5 @@
+import Notification from './Notification'
+
 const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
   // const blogStyle = {
   //   paddingTop: 10,
@@ -14,13 +16,13 @@ const Blog = ({ blog, updateBlog, deleteBlog, username }) => {
     updateBlog(blog.id, updatedBlog)
   }
 
-  if (!blog) return <div>Loading...</div>
+  if (!blog) return null
 
   return (
     <div className='blog'>
       <h3>{blog.author}: {blog.title}</h3>
       <div>
-        <a className='url' href={blog.url}>{blog.url}</a>
+        <a className='url' href={blog.url} target='_blank'>{blog.url}</a>
         <br />
         <span className='likes'>{blog.likes} likes</span>
         {username && (
