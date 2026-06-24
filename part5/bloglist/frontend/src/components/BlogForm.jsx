@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { TextField, Button } from '@mui/material'
+
 
 const BlogForm = ({ createBlog }) => {
   const [newTitle, setNewTitle] = useState('')
@@ -22,39 +24,36 @@ const BlogForm = ({ createBlog }) => {
     <div>
       <form onSubmit={addBlog}>
         <div>
-          <label>
-            title
-            <input
-              type="text"
-              value={newTitle}
-              onChange={({ target }) => setNewTitle(target.value)}
-              placeholder="Enter blog title"
-            />
-          </label>
+          <TextField
+            label="title"
+            type="text"
+            value={newTitle}
+            onChange={({ target }) => setNewTitle(target.value)}
+            placeholder="Enter blog title"
+            style={{ marginTop: 10 }}
+          />
         </div>
         <div>
-          <label>
-            author
-            <input
-              type="text"
-              value={newAuthor}
-              onChange={({ target }) => setNewAuthor(target.value)}
-              placeholder="Enter blog author"
-            />
-          </label>
+          <TextField
+            label="author"
+            type="text"
+            value={newAuthor}
+            onChange={({ target }) => setNewAuthor(target.value)}
+            placeholder="Enter blog author"
+            style={{ marginTop: 10 }}
+          />
         </div>
         <div>
-          <label>
-            url
-            <input
-              type="text"
-              value={newUrl}
-              onChange={({ target }) => setNewUrl(target.value)}
-              placeholder="Enter blog URL"
-            />
-          </label>
+          <TextField
+            label="url"
+            type="text"
+            value={newUrl}
+            onChange={({ target }) => setNewUrl(target.value)}
+            placeholder="Enter blog URL"
+            style={{ marginTop: 10 }}
+          />
         </div>
-        <button type="submit">create</button>
+        <Button type="submit" variant="contained" color="primary" style={{ marginTop: 10 }}>create</Button>
       </form>
     </div>
   )}

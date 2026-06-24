@@ -1,13 +1,10 @@
-import { useState } from 'react'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
-import Notification from './Notification'
 import LoginForm from './LoginForm'
+import { useNavigate } from 'react-router-dom'
 
-const Login = ({ user, setUser }) => {
-
-  const [notification, setNotification] = useState(null)
-  const [notificationType, setNotificationType] = useState('success')
+const Login = ({ user, setUser, setNotification }) => {
+  const navigate = useNavigate()
 
   const doLogin = async (username, password) => {
     try {
@@ -17,27 +14,20 @@ const Login = ({ user, setUser }) => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
-      setNotification(`Logged in successfully! Welcome ${user.name}!`)
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotification(null)
-        window.location.href = '/'
-      }, 3000)
       blogService.setToken(user.token)
       setUser(user)
+      setNotification({ text: `Logged in successfully! Welcome ${user.name}!`, type: 'success' })
+      setTimeout(() => setNotification(null), 3000)
+      navigate('/')
     } catch {
-      setNotification('Wrong username or password')
-      setNotificationType('error')
-      setTimeout(() => {
-        setNotification(null)
-      }, 3000)
+      setNotification({ text: 'Wrong username or password', type: 'error' })
+      setTimeout(() => setNotification(null), 3000)
     }
   }
 
   return (
     <div>
-      <h2>log in to application</h2>
-      <Notification message={notification} type={notificationType} />
+      <h2>Log in to application</h2>
       <LoginForm doLogin={doLogin}/>
     </div>
   )

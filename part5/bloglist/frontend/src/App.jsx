@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react'
+import { Container, AppBar, Toolbar, Button } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+
+
 import blogService from './services/blogs'
 import BlogList from './components/BlogList'
 import CreateBlog from './components/CreateBlog'
 import Login from './components/Login'
 import Blog from './components/Blog'
+import Notification from './components/Notification'
 
 import {
   Routes, Route, Link, useMatch
@@ -13,7 +18,7 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
-  const [notificationType, setNotificationType] = useState('success')
+  const navigate = useNavigate()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -45,8 +50,7 @@ const App = () => {
       returnedBlog.user = updatedBlog.user
       setBlogs(blogs.map(blog => blog.id === id ? returnedBlog : blog).sort((a, b) => b.likes - a.likes))
     } catch (exception) {
-      setNotification('Failed to update blog: ' + (exception.response?.data?.error || exception.message))
-      setNotificationType('error')
+      setNotification({ text: 'Failed to update blog: ' + (exception.response?.data?.error || exception.message), type: 'error' })
       setTimeout(() => {
         setNotification(null)
       }, 5000)
@@ -60,23 +64,15 @@ const App = () => {
       }
       await blogService.remove(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
-      setNotification('Blog removed successfully!')
-      setNotificationType('success')
-      setTimeout(() => {
-        setNotification(null)
-      }, 3000)
-      window.location.href = '/'
+      setNotification({ text: 'Blog removed successfully!', type: 'success' })
+      setTimeout(() => setNotification(null), 3000)
+      navigate('/')
     } catch (exception) {
-      setNotification('Failed to remove blog: ' + (exception.response?.data?.error || exception.message))
-      setNotificationType('error')
+      setNotification({ text: 'Failed to remove blog: ' + (exception.response?.data?.error || exception.message), type: 'error' })
       setTimeout(() => {
         setNotification(null)
       }, 5000)
     }
-  }
-
-  const padding = {
-    padding: 5
   }
   const username = user ? user.username : null
 
@@ -84,17 +80,22 @@ const App = () => {
   const blog = match
     ? blogs.find(b => b.id === match.params.id)
     : null
+  const hoverStyle = { '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' } }
 
   return (
-    <div>
-      <div>
-        <Link style={padding} to="/">blogs</Link>
-        { user && <Link style={padding} to="/create">new blog</Link> }
-        {user
-          ? <button onClick={handleLogout}>logout</button>
-          : <Link style={padding} to="/login">login</Link>
-        }
-      </div>
+    <Container>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/" sx={{ ...hoverStyle, flexGrow: 1, justifyContent: 'flex-start' }}>Blog App</Button>
+          <Button color="inherit" component={Link} to="/" sx={hoverStyle}>blogs</Button>
+          {user && <Button color="inherit" component={Link} to="/create" sx={hoverStyle}>new blog</Button>}
+          {user
+            ? <Button color="inherit" component={Link} sx={hoverStyle} onClick={handleLogout}>logout</Button>
+            : <Button color="inherit" component={Link} sx={hoverStyle} to="/login">login</Button>
+          }
+        </Toolbar>
+      </AppBar>
+      <Notification notification={notification} />
       <Routes>
         <Route path="/blogs/:id" element={
           <>
@@ -105,13 +106,13 @@ const App = () => {
           <BlogList blogs={blogs} setBlogs={setBlogs} user={user} />
         } />
         <Route path="/create" element={
-          <CreateBlog setNotification={setNotification} setNotificationType={setNotificationType} setBlogs={setBlogs} blogs={blogs} user={user} />
+          <CreateBlog setNotification={setNotification} setBlogs={setBlogs} blogs={blogs} user={user} />
         } />
         <Route path="/login" element={
-          <Login user={user} setUser={setUser} />
+          <Login user={user} setUser={setUser} setNotification={setNotification} />
         } />
       </Routes>
-    </div>
+    </Container>
   )
 }
 
